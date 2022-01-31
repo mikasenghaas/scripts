@@ -1,0 +1,5 @@
+#!/bin/zsh
+
+cwd="$(pwd)"
+cd /Users/jonassenghaas; source .zshrc; cd $cwd;
+echo "sourced .zshrc"

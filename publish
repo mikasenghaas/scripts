@@ -1,0 +1,69 @@
+#!/bin/zsh
+
+# global variables
+cwd="$(pwd)"
+server="/Users/jonassenghaas/programming/webdev/jonas-mika.de/server/assets"
+
+# query source file
+echo "Which file do you want to publish?"
+echo "----------------------------------"
+
+cwd=($(ls -l -p | grep -v / | tr -s ' ' ' ' | cut -d ' ' -f9 | grep '\S'))
+i=1
+for file in ${cwd[@]}
+do 
+  echo "[$i] $file"
+  i=$((i+1))
+done
+echo ""
+
+read num"?Choose a Number [1-$((i-1))]: "
+source=${cwd[$num]}
+echo ""
+
+# query relative location to backend server of jonas-mika.de (heroku)
+echo "Where should the file be located?"
+echo "---------------------------------"
+
+ps=($(ls -R -p ~/programming/webdev/jonas-mika.de/server/assets | grep /  | grep "^/" | cut -d/ -f9- | tr ':' ' '))
+
+j=1
+for p in ${ps[@]}
+do 
+  echo "[$j] $p"
+  j=$((j+1))
+done
+echo ""
+
+read num2"?Choose a Number [1-$((j-1))]: "
+dest=${ps[$num2]}
+echo "" 
+
+
+# query to move (and push file)
+while true; do
+  read yn"?Move file ./$source to $dest? [y/n]"
+  case $yn in
+      [Yy]* ) 
+        /bin/cp "$source" "$server/$dest";
+        echo "\n===Moved file succesfuly===";
+
+        while true; do
+          read yn"?Do you want to publish the changes? [y/n]"
+          case $yn in 
+              [Yy]* ) 
+                cd $server; cd ..;
+                git add -A
+                git commit -am "added $source to $dest"
+                git push
+                cd $cwd
+                break;;
+              [Nn]* ) echo "not pushing changes" break;;
+              * ) echo "Please answer yes or no.";;
+          esac
+        done;
+        break;;
+      [Nn]* ) echo "stopped move"; break;;
+      * ) echo "Please answer yes or no.";;
+  esac
+done
