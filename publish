@@ -2,11 +2,9 @@
 
 # global variables
 cwd="$(pwd)"
-server="/Users/jonassenghaas/programming/webdev/jonas-mika.de/server/assets"
+server="/Users/jonas-mika/programming/webdev/jonas-mika.de/server/assets"
 
 # query source file
-echo "Which file do you want to publish?"
-echo "----------------------------------"
 
 cwd=($(ls -l -p | grep -v / | tr -s ' ' ' ' | cut -d ' ' -f9 | grep '\S'))
 i=1
@@ -15,55 +13,56 @@ do
   echo "[$i] $file"
   i=$((i+1))
 done
-echo ""
 
-read num"?Choose a Number [1-$((i-1))]: "
-source=${cwd[$num]}
-echo ""
+echo "\nWhich file(s) do you want to publish?"
+read ans"?>>> Choose numbers (whitespace-separated) [1-$((i-1))]: "
+files=(${(s/ /)ans})
 
-# query relative location to backend server of jonas-mika.de (heroku)
-echo "Where should the file be located?"
-echo "---------------------------------"
+for i in ${files[@]}
+do
+  source=${cwd[i]}
 
-ps=($(ls -R -p ~/programming/webdev/jonas-mika.de/server/assets | grep /  | grep "^/" | cut -d/ -f9- | tr ':' ' '))
+  ps=($(ls -R -p ~/programming/webdev/jonas-mika.de/server/assets | grep /  | grep "^/" | cut -d/ -f9- | tr ':' ' '))
 
-j=1
-for p in ${ps[@]}
-do 
-  echo "[$j] $p"
-  j=$((j+1))
-done
-echo ""
+  i=1
+  for p in ${ps[@]}
+  do 
+    echo "[$i] $p"
+    i=$((i+1))
+  done
+  echo "\nWhere should $source be located?"
 
-read num2"?Choose a Number [1-$((j-1))]: "
-dest=${ps[$num2]}
-echo "" 
+  read num2"?Choose Path [1-$((i-1))]: "
+  dest=${ps[$num2]}
+  echo "" 
 
+  while true; do
+    read yn"?>>> Move file ./$source to $dest? [y/n]"
+    case $yn in
+        [Yy]* ) 
+          /bin/cp "$source" "$server/$dest";
+          echo "Moved file succesfully\n";
+          break;;
+        [Nn]* ) 
+          echo "Didn't move\n"; break;;
+        * ) 
+          echo "Please answer [y]es or [n]o\n";;
+    esac
+  done;
+done;
 
-# query to move (and push file)
-while true; do
-  read yn"?Move file ./$source to $dest? [y/n]"
-  case $yn in
+while true; 
+do
+  read yn"?Do you want to publish the changes? [y/n]"
+  case $yn in 
       [Yy]* ) 
-        /bin/cp "$source" "$server/$dest";
-        echo "\n===Moved file succesfuly===";
-
-        while true; do
-          read yn"?Do you want to publish the changes? [y/n]"
-          case $yn in 
-              [Yy]* ) 
-                cd $server; cd ..;
-                git add -A
-                git commit -am "added $source to $dest"
-                git push
-                cd $cwd
-                break;;
-              [Nn]* ) echo "not pushing changes" break;;
-              * ) echo "Please answer yes or no.";;
-          esac
-        done;
+        cd $server; cd ..;
+        git add -A
+        git commit -am "changes to static files"
+        git push
+        cd $cwd
         break;;
-      [Nn]* ) echo "stopped move"; break;;
+      [Nn]* ) echo "Didn't push changes"; break;;
       * ) echo "Please answer yes or no.";;
   esac
-done
+done;
