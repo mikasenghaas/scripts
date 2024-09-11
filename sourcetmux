@@ -1,3 +1,0 @@
-#!/usr/bin/zsh
-
-tmux source-file ~/.config/tmux/tmux.conf

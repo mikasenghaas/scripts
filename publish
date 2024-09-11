@@ -2,7 +2,7 @@
 
 # global variables
 cwd="$(pwd)"
-server="/Users/jonas-mika/programming/webdev/jonas-mika.de/server/assets"
+server="/Users/jonas-mika/programming/webdev/jonas-mika.de/heroku-server/assets"
 
 # query source file
 
@@ -59,7 +59,7 @@ do
         cd $server; cd ..;
         git add -A
         git commit -am "changes to static files"
-        git push
+        git push heroku master
         cd $cwd
         break;;
       [Nn]* ) echo "Didn't push changes"; break;;
