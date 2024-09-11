@@ -1,0 +1,103 @@
+#!/usr/bin/python3
+"""
+ArXiv Integration for Obsidian
+
+This script is an opinionated integration of arXiv papers into Obsidian
+for literature review.
+
+The script performs the following tasks:
+1. Downloads the metadata and PDF file of a paper from arXiv
+2. Creates a new markdown file in the Obsidian vault (at root) for the paper
+3. Saves the PDF file into an attachment directory
+4. Updates the Map of Content (MOC) file to keep track of all downloaded papers
+
+Usage:
+    Make this script executable and add it to your PATH, then run:
+
+    ```
+    $ save https://arxiv.org/abs/XXXX.XXXXX
+    ````
+
+Note:
+    This script assumes a specific Obsidian vault structure and naming conventions.
+    Modify the global variables (VAULT_DIR, PAPER_DIR, MOC_FILE) to match your Obsidian setup.
+
+Use at your own risk :)
+"""
+
+import os
+import re
+import sys
+from urllib.request import urlopen
+from datetime import datetime
+
+VAULT_DIR = "/Users/jonas-mika/Library/Mobile Documents/iCloud~md~obsidian/Documents/Mika's Vault" # Absolute path
+PAPER_DIR = "Papers" # Relative to VAULT_DIR
+MOC_FILE = "Papers.md" # Relative to VAULT_DIR
+
+def scrape_arxiv(url):
+    with urlopen(url) as response:
+        html = response.read().decode('utf-8')
+    
+    title = re.search(r"<meta name=\"citation_title\" content=\"(.*?)\" />", html).group(1)
+    published = datetime.strptime(re.search(r"<meta name=\"citation_date\" content=\"(.*?)\" />", html).group(1), "%Y/%m/%d").strftime("%Y-%m-%d")
+    authors = list(map(lambda x: " ".join(reversed(x.split(", "))), re.findall(r"<meta name=\"citation_author\" content=\"(.*?)\" />", html)))
+    pdf_url = re.search(r"<meta name=\"citation_pdf_url\" content=\"(.*?)\" />", html).group(1)
+    aliases = [f"{authors[0].split(' ')[-1]} et. al"]
+
+    return {
+        "id": id,
+        "title": title,
+        "published": published,
+        "authors": authors,
+        "pdf_url": pdf_url,
+        "aliases": aliases
+    }
+
+def save_metadata(metadata, filename):
+    with open(filename, 'w') as f:
+        f.write('---\n')
+        f.write(f"added: {metadata['added']}\n")
+        f.write(f"published: {metadata['published']}\n")
+        f.write(f"authors: {metadata['authors']}\n")
+        f.write(f"topics: []\n")
+        f.write(f"aliases: {metadata['aliases']}\n")
+        f.write(f"tags: ['paper']\n")
+        f.write('---\n')
+        f.write(f"Paper: [[{os.path.join(PAPER_DIR, metadata['title'])}.pdf|{metadata['aliases'][0]}]]")
+
+def save_pdf(url, filename):
+    with urlopen(url) as res, open(filename, 'wb') as f:
+        f.write(res.read())
+
+def save_moc(metadata, filename):
+    with open(filename, 'a') as f:
+        f.write(f"[[{metadata['title']}]]\n")
+
+if __name__ == '__main__':
+    # Check for correct usage
+    if len(sys.argv) != 2:
+        print("Usage: save <arxiv_url>")
+        sys.exit(1)
+
+    # Create directories if they don't exist
+    os.makedirs(VAULT_DIR, exist_ok=True)
+    os.makedirs(os.path.join(VAULT_DIR, PAPER_DIR), exist_ok=True)
+    
+    # Scrape metadata from arXiv
+    metadata = {**scrape_arxiv(sys.argv[1]), "added": datetime.now().strftime("%Y-%m-%d")}
+
+    # Check for existing files
+    if os.path.exists(os.path.join(VAULT_DIR, f"{metadata['title']}.md")):
+        print(f"'{metadata['title']}.md' already exists!")
+        sys.exit(1)
+
+    if os.path.exists(os.path.join(VAULT_DIR, PAPER_DIR, f"{metadata['title']}.pdf")):
+        print(f"'{metadata['title']}.pdf' already exists!")
+        sys.exit(1)
+
+    # Save files
+    save_metadata(metadata, os.path.join(VAULT_DIR, f"{metadata['title']}.md"))
+    save_pdf(metadata["pdf_url"], os.path.join(VAULT_DIR, PAPER_DIR, f"{metadata['title']}.pdf"))
+    save_moc(metadata, os.path.join(VAULT_DIR, MOC_FILE))
+    print(f"Saved '{metadata['title']}'!")
