@@ -1,32 +1,40 @@
 #!/bin/bash
 
+# Colors for output
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+
+log() {
+    echo -e "${GREEN}$1${NC}"
+}
+
 # Install sudo if not present
 if ! command -v sudo &>/dev/null; then
   apt update && apt install -y sudo
 fi
 
-echo "Installing apt packages..."
+log "Installing apt packages..."
 sudo apt update && sudo apt install -y tmux git htop nvtop exa bat iputils-ping iperf speedtest-cli
 
-echo "Installing locales..."
+log "Installing locales..."
 sudo apt install -y --no-install-recommends locales
 locale-gen "en_US.UTF-8"
 
-echo "Installing uv..."
+log "Installing uv..."
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-echo "Sourcing uv environment..."
+log "Sourcing uv environment..."
 if ! command -v uv &>/dev/null; then
   source $HOME/.local/bin/env
 fi
 
-echo "Installing starship..."
+log "Installing starship..."
 curl -sS https://starship.rs/install.sh | sh
 
-echo "Installing atuin..."
-curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
+log "Installing atuin..."
+yes | bash <(curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh)
 
-echo "Updating .bashrc..."
+log "Updating .bashrc..."
 cat >$HOME/.bashrc <<'EOL'
 alias ls="exa"
 alias ll="exa -lal"
@@ -41,4 +49,4 @@ eval "$(starship init bash)"
 eval "$(atuin init bash --disable-up-arrow)"
 EOL
 
-echo "Installation completed! Please restart your shell and run 'bash'"
+log "Installation completed! Please restart your shell and run 'bash'"
