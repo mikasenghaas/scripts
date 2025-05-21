@@ -16,6 +16,9 @@ fi
 log "Installing apt packages..."
 sudo apt update && sudo apt install -y tmux git htop nvtop exa bat iputils-ping iperf speedtest-cli
 
+log "Configuring SSH to automatically accept GitHub's host key..."
+ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null
+
 log "Installing locales..."
 sudo apt install -y --no-install-recommends locales
 locale-gen "en_US.UTF-8"
