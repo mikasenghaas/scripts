@@ -22,12 +22,8 @@ sudo apt update && sudo apt install -y tmux git htop nvtop exa bat iputils-ping 
 log "Configuring SSH to automatically accept GitHub's host key..."
 ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null
 
-log "Installing locales..."
-sudo apt install -y --no-install-recommends locales
-locale-gen "en_US.UTF-8"
-
 log "Installing uv..."
-curl -LsSf https://astral.sh/uv/install.sh | sh
+curl -LsSf https://astral.sh/uv/install.sh | sudo sh
 
 log "Sourcing uv environment..."
 if ! command -v uv &>/dev/null; then
@@ -35,10 +31,10 @@ if ! command -v uv &>/dev/null; then
 fi
 
 log "Installing starship..."
-curl -sS https://starship.rs/install.sh | sh -s -- -y
+curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
 
 log "Installing atuin..."
-curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
+curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sudo sh
 
 log "Updating .bashrc..."
 cat >$HOME/.bashrc <<'EOL'
@@ -55,4 +51,4 @@ eval "$(starship init bash)"
 eval "$(atuin init bash --disable-up-arrow)"
 EOL
 
-log "Installation completed! Please restart your shell by running 'source $HOME/.bashrc'"
+log "Installation completed! Please restart your shell by running 'bash'"
