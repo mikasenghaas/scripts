@@ -11,11 +11,12 @@ log() {
 }
 
 # Install sudo if not present
+log "Updating package index..."
 if ! command -v sudo &>/dev/null; then
   apt update && apt install -y sudo
 fi
 
-log "Installing apt packages..."
+log "Installing packages..."
 sudo apt update && sudo apt install -y tmux git htop nvtop exa bat iputils-ping iperf speedtest-cli
 
 log "Configuring SSH to automatically accept GitHub's host key..."
@@ -54,7 +55,4 @@ eval "$(starship init bash)"
 eval "$(atuin init bash --disable-up-arrow)"
 EOL
 
-log "Reloading .bashrc..."
-source $HOME/.bashrc
-
-log "Installation completed!"
+log "Installation completed! Please restart your shell by running 'source $HOME/.bashrc'"
