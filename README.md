@@ -6,5 +6,5 @@ development workflow on a daily basis.
 ## Remote Setup
 
 ```bash
-curl -sS https://raw.githubusercontent.com/mikasenghaas/scripts/main/remote-setup | bash
+curl -sS https://raw.githubusercontent.com/mikasenghaas/scripts/main/setup-remote | bash
 ```
