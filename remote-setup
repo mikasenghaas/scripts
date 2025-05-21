@@ -5,7 +5,7 @@ GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
 log() {
-    echo -e "${GREEN}[INFO]${NC} $1$"
+    echo -e "${GREEN}[INFO]${NC} $1"
 }
 
 # Install sudo if not present
@@ -29,10 +29,10 @@ if ! command -v uv &>/dev/null; then
 fi
 
 log "Installing starship..."
-curl -sS https://starship.rs/install.sh | sh
+yes | curl -sS https://starship.rs/install.sh | sh
 
 log "Installing atuin..."
-yes | bash <(curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh)
+curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
 
 log "Updating .bashrc..."
 cat >$HOME/.bashrc <<'EOL'
