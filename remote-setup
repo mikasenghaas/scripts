@@ -32,7 +32,7 @@ if ! command -v uv &>/dev/null; then
 fi
 
 log "Installing starship..."
-yes | curl -sS https://starship.rs/install.sh | sh
+curl -sS https://starship.rs/install.sh | sh -s -- -y
 
 log "Installing atuin..."
 curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
@@ -52,4 +52,7 @@ eval "$(starship init bash)"
 eval "$(atuin init bash --disable-up-arrow)"
 EOL
 
-log "Installation completed! Please restart your shell and run 'bash'"
+log "Reloading .bashrc..."
+source $HOME/.bashrc
+
+log "Installation completed!"
