@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# Install sudo if not present
+if ! command -v sudo &>/dev/null; then
+  apt update && apt install -y sudo
+fi
+
+echo "Installing apt packages..."
+sudo apt update && sudo apt install -y tmux git htop nvtop exa bat iputils-ping iperf speedtest-cli
+
+echo "Installing locales..."
+sudo apt install -y --no-install-recommends locales
+locale-gen "en_US.UTF-8"
+
+echo "Installing uv..."
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+echo "Sourcing uv environment..."
+if ! command -v uv &>/dev/null; then
+  source $HOME/.local/bin/env
+fi
+
+echo "Installing starship..."
+curl -sS https://starship.rs/install.sh | sh
+
+echo "Installing atuin..."
+curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
+
+echo "Updating .bashrc..."
+cat >$HOME/.bashrc <<'EOL'
+alias ls="exa"
+alias ll="exa -lal"
+alias cat="bat --style=plain"
+
+source $HOME/.local/bin/env
+
+eval "$(starship init bash)"
+
+. "$HOME/.atuin/bin/env"
+
+eval "$(atuin init bash --disable-up-arrow)"
+EOL
+
+echo "Installation completed! Please restart your shell and run 'bash'"
