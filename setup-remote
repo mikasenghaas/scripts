@@ -7,7 +7,7 @@ GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
 log() {
-    echo -e "${GREEN}[INFO]${NC} $1"
+  echo -e "${GREEN}[INFO]${NC} $1"
 }
 
 # Install sudo if not present
@@ -17,10 +17,10 @@ if ! command -v sudo &>/dev/null; then
 fi
 
 log "Installing packages..."
-sudo apt update && sudo apt install -y tmux git htop nvtop exa bat iputils-ping iperf speedtest-cli
+sudo apt update && sudo apt install -y tmux git gh htop nvtop exa bat iputils-ping iperf speedtest-cli
 
 log "Configuring SSH to automatically accept GitHub's host key..."
-ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null
+ssh-keyscan github.com >>~/.ssh/known_hosts 2>/dev/null
 
 log "Installing uv..."
 curl -LsSf https://astral.sh/uv/install.sh | sudo sh
