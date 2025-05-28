@@ -34,7 +34,7 @@ log "Installing starship..."
 curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
 
 log "Installing atuin..."
-curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sudo sh
+curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
 
 log "Updating .bashrc..."
 cat >$HOME/.bashrc <<'EOL'
