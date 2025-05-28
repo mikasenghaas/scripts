@@ -23,7 +23,7 @@ log "Configuring SSH to automatically accept GitHub's host key..."
 ssh-keyscan github.com >>~/.ssh/known_hosts 2>/dev/null
 
 log "Installing uv..."
-curl -LsSf https://astral.sh/uv/install.sh | sudo sh
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
 log "Sourcing uv environment..."
 if ! command -v uv &>/dev/null; then
