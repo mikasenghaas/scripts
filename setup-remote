@@ -45,10 +45,6 @@ alias cat="bat --style=plain"
 source $HOME/.local/bin/env
 
 eval "$(starship init bash)"
-
-. "$HOME/.atuin/bin/env"
-
-eval "$(atuin init bash --disable-up-arrow)"
 EOL
 
 log "Installation completed! Please restart your shell by running 'bash'"
