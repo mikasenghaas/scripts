@@ -43,6 +43,10 @@ alias ls="exa"
 alias ll="exa -lal"
 alias cat="bat --style=plain"
 
+# Make bat available on ubuntu
+mkdir -p ~/.local/bin
+ln -s /usr/bin/batcat ~/.local/bin/bat
+
 # Add uv installation path to path 
 source $HOME/.local/bin/env
 
