@@ -17,7 +17,7 @@ if ! command -v sudo &>/dev/null; then
 fi
 
 log "Installing packages..."
-sudo apt update && sudo apt install -y tmux git gh htop nvtop exa bat iputils-ping iperf speedtest-cli
+sudo apt update && sudo apt install -y tmux git gh htop nvtop exa bat fzf iputils-ping iperf speedtest-cli
 
 log "Configuring SSH to automatically accept GitHub's host key..."
 ssh-keyscan github.com >>~/.ssh/known_hosts 2>/dev/null
@@ -42,9 +42,14 @@ alias ls="exa"
 alias ll="exa -lal"
 alias cat="bat --style=plain"
 
+# Add uv installation path to path 
 source $HOME/.local/bin/env
 
+# Initialize starship
 eval "$(starship init bash)"
+
+# Enable fzf key bindings
+eval "$(fzf --bash)"
 EOL
 
 log "Installation completed! Please restart your shell by running 'bash'"
