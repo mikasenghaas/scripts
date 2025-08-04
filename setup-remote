@@ -55,4 +55,4 @@ export PATH="$HOME/.local/bin:$PATH"
 eval "$(starship init bash)"
 EOL
 
-log "Installation completed! Please restart your shell by running 'bash'"
+log "Installation completed! Please restart your shell by running 'source .bashrc'"
