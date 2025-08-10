@@ -37,6 +37,9 @@ log "Installing fzf..."
 rm -rf ~/.fzf && git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
 ~/.fzf/install --all
 
+log "Installing cursor-agent..."
+curl https://cursor.com/install -fsS | bash
+
 log "Updating .bashrc..."
 cat >$HOME/.bashrc <<'EOL'
 alias ls="exa"
@@ -48,7 +51,7 @@ if [ ! -e ~/.local/bin/bat ]; then
     ln -s /usr/bin/batcat ~/.local/bin/bat
 fi
 
-# Add uv installation path to path
+# Add ~/.local/bin to path (for uv and cursor-agent)
 export PATH="$HOME/.local/bin:$PATH"
 
 # Initialize starship
