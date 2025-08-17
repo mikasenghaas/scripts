@@ -1,0 +1,46 @@
+#!/bin/bash
+# notifyme: minimal notifier
+set -u
+
+topic="${NTFY_TOPIC:-mika-test}"
+ntfy_url="${NTFY_URL:-https://ntfy.sh}"
+
+format_elapsed() {
+  local total="${1:-0}"
+  if (( total >= 86400 )); then
+    echo "$(( total / 86400 ))d"
+  elif (( total >= 3600 )); then
+    echo "$(( total / 3600 ))h"
+  elif (( total >= 60 )); then
+    echo "$(( total / 60 ))m"
+  else
+    echo "${total}s"
+  fi
+}
+
+send_notification() {
+  local cmd="${1:-job}" status="${2:-0}" elapsed="${3:-}"
+  local ip=$(curl -s https://ipinfo.io/ip)
+  local title suffix=""
+  if [[ -n "$elapsed" ]]; then
+    suffix=" in ${elapsed}s"
+  fi
+  if [ "$status" -eq 0 ]; then
+    title="✅ Job succeeded on $ip${suffix}"
+  else
+    title="❌ Job failed on $ip${suffix}"
+  fi
+  curl -fsS -H "Title: $title" -H "Priority: high" -d "$cmd" "$ntfy_url/$topic" >/dev/null || true
+}
+
+main() {
+  start=$(date +%s)
+  "$@"
+  st=$?
+  end=$(date +%s)
+  elapsed=$((end - start))
+  send_notification "$*" "$st" "$elapsed"
+  exit $st
+}
+
+main "$@"
