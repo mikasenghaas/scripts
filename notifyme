@@ -1,9 +1,8 @@
 #!/bin/bash
-# notifyme: minimal notifier
+# discord webhook notifier
 set -u
 
-topic="${NTFY_TOPIC:-mika-test}"
-ntfy_url="${NTFY_URL:-https://ntfy.sh}"
+webhook_url="${DISCORD_WEBHOOK_URL:-}"
 
 format_elapsed() {
   local total="${1:-0}"
@@ -20,20 +19,38 @@ format_elapsed() {
 
 send_notification() {
   local cmd="${1:-job}" status="${2:-0}" elapsed="${3:-}"
-  local ip=$(curl -s https://ipinfo.io/ip)
+  local host=$(hostname -s)
   local title suffix=""
+  
   if [[ -n "$elapsed" ]]; then
-    suffix=" in ${elapsed}s"
+    suffix=" in $(format_elapsed "$elapsed")"
   fi
+  
   if [ "$status" -eq 0 ]; then
-    title="✅ Job succeeded on $ip${suffix}"
+    title="✅ Job succeeded on $host${suffix}"
   else
-    title="❌ Job failed on $ip${suffix}"
+    title="❌ Job failed on $host${suffix}"
   fi
-  curl -fsS -H "Title: $title" -H "Priority: high" -d "$cmd" "$ntfy_url/$topic" >/dev/null || true
+  
+  msg=$(cat <<EOF
+$title
+\`\`\`bash
+$cmd
+\`\`\`
+EOF
+)
+  
+  if [ -n "$webhook_url" ]; then
+    curl -fsS -X POST -F "content=$msg" "$webhook_url" >/dev/null || true
+  fi
 }
 
 main() {
+  if [ -z "$webhook_url" ]; then
+    echo "Set DISCORD_WEBHOOK_URL environment variable" >&2
+    exit 2
+  fi
+  
   start=$(date +%s)
   "$@"
   st=$?
