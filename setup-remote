@@ -56,9 +56,6 @@ sudo apt update && sudo apt install gh -y
 log "Installing starship..."
 curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
 
-log "Installing cursor-agent..."
-curl https://cursor.com/install -fsS | bash
-
 log "Updating .bashrc..."
 cat >$HOME/.bashrc <<'EOL'
 alias ls="exa"
