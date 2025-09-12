@@ -33,6 +33,9 @@ curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
   sudo gpg --dearmor --output /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg && \
   sudo apt update && sudo apt install 1password-cli
 
+log "Signing into 1Password..."
+OP_SESSION_default=$(op signin -f --raw)"
+
 log "Installing uv..."
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
@@ -70,6 +73,9 @@ fi
 # Add ~/.local/bin to path (for uv and cursor-agent)
 export PATH="$HOME/.local/bin:$PATH"
 
+# Export 1Password session
+export OP_SESSION_default=$OP_SESSION_default
+
 # Inject secrets
 export GH_TOKEN=$(op read "op://Employee/GitHub Personal Access Token/token")
 export HF_TOKEN=$(op read "op://Employee/Hugging Face API Token/user access token")
@@ -81,4 +87,3 @@ eval "$(starship init bash)"
 EOL
 
 log "Installation completed! Please restart your shell by running 'source .bashrc'"
-log "To use your secrets, run `op signin`!"
