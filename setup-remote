@@ -67,7 +67,7 @@ if [ ! -e ~/.local/bin/bat ]; then
     ln -s /usr/bin/batcat ~/.local/bin/bat
 fi
 
-# Add ~/.local/bin to path (for uv and cursor-agent)
+# Add ~/.local/bin to path (for uv)
 export PATH="$HOME/.local/bin:$PATH"
 
 # Export 1Password session
