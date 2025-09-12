@@ -17,7 +17,7 @@ if ! command -v sudo &>/dev/null; then
 fi
 
 log "Installing packages..."
-sudo apt update && sudo apt install -y tmux git htop nvtop exa bat iputils-ping iperf speedtest-cli
+sudo apt update && sudo apt install -y tmux vim git htop nvtop exa bat iputils-ping iperf speedtest-cli
 
 # Install 1Password CLI
 log "Installing 1Password CLI..."
@@ -74,7 +74,9 @@ fi
 export PATH="$HOME/.local/bin:$PATH"
 
 # Export 1Password session
-export OP_SESSION_default=$OP_SESSION_default
+EOL
+echo "export OP_SESSION_default='${OP_SESSION_default}'" >> $HOME/.bashrc
+cat >>$HOME/.bashrc <<'EOL'
 
 # Inject secrets
 export GH_TOKEN=$(op read "op://Employee/GitHub Personal Access Token/token")
