@@ -20,6 +20,7 @@ log "Installing packages..."
 sudo apt update && sudo apt install -y tmux git gh htop nvtop exa bat iputils-ping iperf speedtest-cli
 
 # Install 1Password CLI
+log "Installing 1Password CLI..."
 curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
   sudo gpg --dearmor --output /usr/share/keyrings/1password-archive-keyring.gpg && \
   echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/$(dpkg --print-architecture) stable main" | \
@@ -39,6 +40,9 @@ log "Sourcing uv environment..."
 if ! command -v uv &>/dev/null; then
   source $HOME/.local/bin/env
 fi
+
+log "Installing HuggingFace CLI..."
+uv tool install huggingface-hub[cli]
 
 log "Installing starship..."
 curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
