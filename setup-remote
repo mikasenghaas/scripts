@@ -80,4 +80,5 @@ export PRIME_API_KEY=$(op read "op://Employee/Prime API Key/api key")
 eval "$(starship init bash)"
 EOL
 
-log "Installation completed! To use your secrets, please run 'op signin' and restart your shell with 'source .bashrc' after."
+log "Installation completed! Please restart your shell by running 'source .bashrc'"
+log "To use your secrets, run `op signin`!"
