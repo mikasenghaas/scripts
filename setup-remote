@@ -81,6 +81,7 @@ export GH_TOKEN=$(op read "op://Employee/GitHub Personal Access Token/token")
 export HF_TOKEN=$(op read "op://Employee/Hugging Face API Token/user access token")
 export OPENAI_API_KEY=$(op read "op://Employee/OpenAI API Key/api key")
 export PRIME_API_KEY=$(op read "op://Employee/Prime API Key/api key")
+export PRIME_TEAM_ID=$(op read "op://Shared/Prime Team ID/team id")
 
 # Initialize starship
 eval "$(starship init bash)"
