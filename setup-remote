@@ -34,7 +34,7 @@ curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
   sudo apt update && sudo apt install 1password-cli
 
 log "Signing into 1Password..."
-OP_SESSION_default=$(op signin -f --raw)
+OP_SESSION=$(op signin -f --raw)
 
 log "Installing uv..."
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -76,7 +76,7 @@ export PATH="$HOME/.local/bin:$PATH"
 # Export 1Password session
 EOL
 
-echo 'export OP_SESSION_2URB2EH2IBHUZGTOTFKTR2TY6E="${OP_SESSION_default}"' >> $HOME/.bashrc
+echo "export OP_SESSION_2URB2EH2IBHUZGTOTFKTR2TY6E='${OP_SESSION}'" >> $HOME/.bashrc
 cat >>$HOME/.bashrc <<'EOL'
 
 # Inject secrets
