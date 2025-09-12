@@ -75,7 +75,8 @@ export PATH="$HOME/.local/bin:$PATH"
 
 # Export 1Password session
 EOL
-echo "export OP_SESSION_default='${OP_SESSION_default}'" >> $HOME/.bashrc
+
+echo 'export OP_SESSION_2URB2EH2IBHUZGTOTFKTR2TY6E="${OP_SESSION_default}"' >> $HOME/.bashrc
 cat >>$HOME/.bashrc <<'EOL'
 
 # Inject secrets
