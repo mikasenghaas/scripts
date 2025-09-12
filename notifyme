@@ -6,12 +6,12 @@ webhook_url="${DISCORD_WEBHOOK_URL:-}"
 
 format_elapsed() {
   local total="${1:-0}"
-  if (( total >= 86400 )); then
-    echo "$(( total / 86400 ))d"
-  elif (( total >= 3600 )); then
-    echo "$(( total / 3600 ))h"
-  elif (( total >= 60 )); then
-    echo "$(( total / 60 ))m"
+  if ((total >= 86400)); then
+    echo "$((total / 86400))d"
+  elif ((total >= 3600)); then
+    echo "$((total / 3600))h"
+  elif ((total >= 60)); then
+    echo "$((total / 60))m"
   else
     echo "${total}s"
   fi
@@ -21,25 +21,26 @@ send_notification() {
   local cmd="${1:-job}" status="${2:-0}" elapsed="${3:-}"
   local host=$(hostname -s)
   local title suffix=""
-  
+
   if [[ -n "$elapsed" ]]; then
     suffix=" in $(format_elapsed "$elapsed")"
   fi
-  
+
   if [ "$status" -eq 0 ]; then
     title="✅ Job succeeded on $host${suffix}"
   else
     title="❌ Job failed on $host${suffix}"
   fi
-  
-  msg=$(cat <<EOF
+
+  msg=$(
+    cat <<EOF
 $title
 \`\`\`bash
 $cmd
 \`\`\`
 EOF
-)
-  
+  )
+
   if [ -n "$webhook_url" ]; then
     curl -fsS -X POST -F "content=$msg" "$webhook_url" >/dev/null || true
   fi
@@ -50,7 +51,7 @@ main() {
     echo "Set DISCORD_WEBHOOK_URL environment variable" >&2
     exit 2
   fi
-  
+
   start=$(date +%s)
   "$@"
   st=$?
