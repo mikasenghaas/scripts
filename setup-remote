@@ -17,7 +17,7 @@ if ! command -v sudo &>/dev/null; then
 fi
 
 log "Installing packages..."
-sudo apt update && sudo apt install -y tmux git gh htop nvtop exa bat iputils-ping iperf speedtest-cli
+sudo apt update && sudo apt install -y tmux git htop nvtop exa bat iputils-ping iperf speedtest-cli
 
 # Install 1Password CLI
 log "Installing 1Password CLI..."
@@ -44,6 +44,12 @@ fi
 log "Installing HuggingFace CLI..."
 uv tool install huggingface-hub[cli]
 
+log "Installing Prime CLI..."
+uv tool install prime
+
+log "Installing GitHub CLI..."
+sudo apt update && sudo apt install gh -y
+
 log "Installing starship..."
 curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
 
@@ -64,8 +70,15 @@ fi
 # Add ~/.local/bin to path (for uv and cursor-agent)
 export PATH="$HOME/.local/bin:$PATH"
 
+# Inject secrets
+export GH_TOKEN=$(op read "op://Employee/GitHub Personal Access Token/token")
+export HF_TOKEN=$(op read "op://Employee/Hugging Face API Token/user access token")
+export OPENAI_API_KEY=$(op read "op://Employee/OpenAI API Key/api key")
+export PRIME_API_KEY=$(op read "op://Employee/Prime API Key/api key")
+
 # Initialize starship
 eval "$(starship init bash)"
 EOL
 
 log "Installation completed! Please restart your shell by running 'source .bashrc'"
+log "To use your secrets, run `op signin`!"
