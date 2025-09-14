@@ -20,35 +20,41 @@ log "Installing packages..."
 sudo apt update && sudo apt install -y tmux vim git htop nvtop exa bat iputils-ping iperf speedtest-cli
 
 # Install 1Password CLI
-log "Installing 1Password CLI..."
-curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
-  sudo gpg --dearmor --output /usr/share/keyrings/1password-archive-keyring.gpg && \
-  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/$(dpkg --print-architecture) stable main" | \
-  sudo tee /etc/apt/sources.list.d/1password.list && \
-  sudo mkdir -p /etc/debsig/policies/AC2D62742012EA22/ && \
-  curl -sS https://downloads.1password.com/linux/debian/debsig/1password.pol | \
-  sudo tee /etc/debsig/policies/AC2D62742012EA22/1password.pol && \
-  sudo mkdir -p /usr/share/debsig/keyrings/AC2D62742012EA22 && \
+if ! command -v op &>/dev/null; then
+  log "Installing 1Password CLI..."
   curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
-  sudo gpg --dearmor --output /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg && \
-  sudo apt update && sudo apt install 1password-cli
+    sudo gpg --dearmor --output /usr/share/keyrings/1password-archive-keyring.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/$(dpkg --print-architecture) stable main" | \
+    sudo tee /etc/apt/sources.list.d/1password.list && \
+    sudo mkdir -p /etc/debsig/policies/AC2D62742012EA22/ && \
+    curl -sS https://downloads.1password.com/linux/debian/debsig/1password.pol | \
+    sudo tee /etc/debsig/policies/AC2D62742012EA22/1password.pol && \
+    sudo mkdir -p /usr/share/debsig/keyrings/AC2D62742012EA22 && \
+    curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
+    sudo gpg --dearmor --output /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg && \
+    sudo apt update && sudo apt install 1password-cli
+fi
 
-log "Installing uv..."
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-log "Sourcing uv environment..."
 if ! command -v uv &>/dev/null; then
+  log "Installing uv..."
+  curl -LsSf https://astral.sh/uv/install.sh | sh
   source $HOME/.local/bin/env
 fi
 
-log "Installing HuggingFace CLI..."
-uv tool install huggingface-hub[cli]
+if ! command -v hf &>/dev/null; then
+  log "Installing HuggingFace CLI..."
+  uv tool install huggingface-hub[cli]
+fi
 
-log "Installing Prime CLI..."
-uv tool install prime
+if ! command -v prime &>/dev/null; then
+  log "Installing Prime CLI..."
+  uv tool install prime
+fi
 
-log "Installing GitHub CLI..."
-sudo apt update && sudo apt install gh -y
+if ! command -v gh &>/dev/null; then
+  log "Installing GitHub CLI..."
+  sudo apt update && sudo apt install gh -y
+fi
 
 log "Installing starship..."
 curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
