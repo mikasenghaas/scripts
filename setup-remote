@@ -67,19 +67,21 @@ fi
 # Add ~/.local/bin to path (for uv)
 export PATH="$HOME/.local/bin:$PATH"
 
-# Export 1Password service account token
-EOL
+# Check for 1Password service account token
+if [ -z "$OP_SERVICE_ACCOUNT_TOKEN" ]; then
+    echo "1Password service account token not found."
+    read -p "Enter your 1Password service account token: " OP_SERVICE_ACCOUNT_TOKEN
+    export OP_SERVICE_ACCOUNT_TOKEN="$OP_SERVICE_ACCOUNT_TOKEN"
+fi
 
-read -p "Enter your 1Password service account token: " OP_SERVICE_ACCOUNT_TOKEN
-echo "export OP_SERVICE_ACCOUNT_TOKEN='${OP_SERVICE_ACCOUNT_TOKEN}'" >> $HOME/.bashrc
-cat >>$HOME/.bashrc <<'EOL'
-
-# Inject secrets
-export GH_TOKEN=$(op read "op://Remote/GitHub Personal Access Token/token")
-export HF_TOKEN=$(op read "op://Remote/Hugging Face API Token/user access token")
-export OPENAI_API_KEY=$(op read "op://Remote/OpenAI API Key/api key")
-export PRIME_API_KEY=$(op read "op://Remote/Prime API Key/api key")
-export PRIME_TEAM_ID=$(op read "op://Remote/Prime Team ID/team id")
+# Inject secrets (only if op command is available and token is set)
+if command -v op &>/dev/null && [ -n "$OP_SERVICE_ACCOUNT_TOKEN" ]; then
+    export GH_TOKEN=$(op read "op://Remote/GitHub Personal Access Token/token" 2>/dev/null || echo "")
+    export HF_TOKEN=$(op read "op://Remote/Hugging Face API Token/user access token" 2>/dev/null || echo "")
+    export OPENAI_API_KEY=$(op read "op://Remote/OpenAI API Key/api key" 2>/dev/null || echo "")
+    export PRIME_API_KEY=$(op read "op://Remote/Prime API Key/api key" 2>/dev/null || echo "")
+    export PRIME_TEAM_ID=$(op read "op://Remote/Prime Team ID/team id" 2>/dev/null || echo "")
+fi
 
 # Initialize starship
 eval "$(starship init bash)"
