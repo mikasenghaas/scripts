@@ -46,6 +46,11 @@ if ! command -v hf &>/dev/null; then
   uv tool install huggingface-hub[cli]
 fi
 
+if ! command -v wandb &>/dev/null; then
+  log "Installing Wandb CLI..."
+  uv tool install wandb
+fi
+
 if ! command -v prime &>/dev/null; then
   log "Installing Prime CLI..."
   uv tool install prime
