@@ -87,7 +87,7 @@ if command -v op &>/dev/null && [ -n "$OP_SERVICE_ACCOUNT_TOKEN" ]; then
     export OPENAI_API_KEY=$(op read "op://Remote/OpenAI API Key/api key" 2>/dev/null || echo "")
     export PRIME_API_KEY=$(op read "op://Remote/Prime API Key/api key" 2>/dev/null || echo "")
     export PRIME_TEAM_ID=$(op read "op://Remote/Prime Team ID/team id" 2>/dev/null || echo "")
-    export WANDB_API_KEY=$(op read "op://Remote/W&B API Key/api key" 2>/dev/null || echo "")
+    export WANDB_API_KEY=$(op read "op://Remote/Wandb API Key/api key" 2>/dev/null || echo "")
 fi
 
 # Initialize starship
