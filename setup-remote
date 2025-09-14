@@ -33,9 +33,6 @@ curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
   sudo gpg --dearmor --output /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg && \
   sudo apt update && sudo apt install 1password-cli
 
-log "Signing into 1Password..."
-OP_SESSION=$(op signin -f --raw)
-
 log "Installing uv..."
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
@@ -70,10 +67,11 @@ fi
 # Add ~/.local/bin to path (for uv)
 export PATH="$HOME/.local/bin:$PATH"
 
-# Export 1Password session
+# Export 1Password service account token
 EOL
 
-echo "export OP_SESSION_2URB2EH2IBHUZGTOTFKTR2TY6E='${OP_SESSION}'" >> $HOME/.bashrc
+read -p "Enter your 1Password service account token: " OP_SERVICE_ACCOUNT_TOKEN
+echo "export OP_SERVICE_ACCOUNT_TOKEN='${OP_SERVICE_ACCOUNT_TOKEN}'" >> $HOME/.bashrc
 cat >>$HOME/.bashrc <<'EOL'
 
 # Inject secrets
