@@ -22,16 +22,16 @@ sudo apt update && sudo apt install -y tmux vim git htop nvtop exa bat iputils-p
 # Install 1Password CLI
 if ! command -v op &>/dev/null; then
   log "Installing 1Password CLI..."
-  curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
-    sudo gpg --dearmor --output /usr/share/keyrings/1password-archive-keyring.gpg && \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/$(dpkg --print-architecture) stable main" | \
-    sudo tee /etc/apt/sources.list.d/1password.list && \
-    sudo mkdir -p /etc/debsig/policies/AC2D62742012EA22/ && \
-    curl -sS https://downloads.1password.com/linux/debian/debsig/1password.pol | \
-    sudo tee /etc/debsig/policies/AC2D62742012EA22/1password.pol && \
-    sudo mkdir -p /usr/share/debsig/keyrings/AC2D62742012EA22 && \
-    curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
-    sudo gpg --dearmor --output /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg && \
+  curl -sS https://downloads.1password.com/linux/keys/1password.asc |
+    sudo gpg --dearmor --output /usr/share/keyrings/1password-archive-keyring.gpg &&
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/$(dpkg --print-architecture) stable main" |
+    sudo tee /etc/apt/sources.list.d/1password.list &&
+    sudo mkdir -p /etc/debsig/policies/AC2D62742012EA22/ &&
+    curl -sS https://downloads.1password.com/linux/debian/debsig/1password.pol |
+    sudo tee /etc/debsig/policies/AC2D62742012EA22/1password.pol &&
+    sudo mkdir -p /usr/share/debsig/keyrings/AC2D62742012EA22 &&
+    curl -sS https://downloads.1password.com/linux/keys/1password.asc |
+    sudo gpg --dearmor --output /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg &&
     sudo apt update && sudo apt install 1password-cli
 fi
 
@@ -66,6 +66,10 @@ curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
 
 log "Updating .bashrc..."
 cat >$HOME/.bashrc <<'EOL'
+# Guard
+[[ $- != *i* ]] && return
+
+# Aliases
 alias ls="exa"
 alias ll="exa -lal"
 alias cat="bat --style=plain"
@@ -100,3 +104,4 @@ eval "$(starship init bash)"
 EOL
 
 log "Installation completed! Please restart your shell by running 'source .bashrc'"
+
