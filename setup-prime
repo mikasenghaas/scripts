@@ -1,0 +1,40 @@
+#!/bin/bash
+
+set -e
+
+# Colors for output
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+
+log() {
+  echo -e "${GREEN}[INFO]${NC} $1"
+}
+
+log "Setting up prime-rl..."
+curl -sSL https://raw.githubusercontent.com/PrimeIntellect-ai/prime-rl/main/scripts/install.sh | bash
+
+log "Setting up prime-environments..."
+curl -sSL https://raw.githubusercontent.com/PrimeIntellect-ai/prime-environments/main/scripts/install.sh | bash
+
+log "Setting up verifiers..."
+curl -sSL https://raw.githubusercontent.com/PrimeIntellect-ai/verifiers/main/scripts/install.sh | bash
+
+log "Setting up workspace..."
+cat > prime.code-workspace <<'EOL'
+{
+    "folders": [
+        {
+            "path": "prime-rl"
+        },
+        {
+            "path": "verifiers"
+        },
+        {
+            "path": "prime-environments"
+        }
+    ],
+    "settings": {}
+}
+EOL
+
+log "Setup completed!"
