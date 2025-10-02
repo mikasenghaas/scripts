@@ -82,15 +82,13 @@ fi
 # Add ~/.local/bin to path (for uv)
 export PATH="$HOME/.local/bin:$PATH"
 
-# Check for 1Password service account token
+# Access 1Password secrets temporarily
+export OP_SERVICE_ACCOUNT_TOKEN=
+ 
+# # Check for 1Password service account token
 if [ -z "$OP_SERVICE_ACCOUNT_TOKEN" ]; then
-    echo "1Password service account token not found."
-    read -p "Enter your 1Password service account token: " OP_SERVICE_ACCOUNT_TOKEN
-    export OP_SERVICE_ACCOUNT_TOKEN="$OP_SERVICE_ACCOUNT_TOKEN"
-fi
-
-# Inject secrets (only if op command is available and token is set)
-if command -v op &>/dev/null && [ -n "$OP_SERVICE_ACCOUNT_TOKEN" ]; then
+    echo "1Password service account token not set. You won't be able to access your secrets."
+else
     export GH_TOKEN=$(op read "op://Remote/GitHub Personal Access Token/token" 2>/dev/null || echo "")
     export HF_TOKEN=$(op read "op://Remote/Hugging Face API Token/user access token" 2>/dev/null || echo "")
     export OPENAI_API_KEY=$(op read "op://Remote/OpenAI API Key/api key" 2>/dev/null || echo "")
@@ -101,7 +99,7 @@ fi
 
 # Initialize starship
 eval "$(starship init bash)"
+
 EOL
 
-log "Installation completed! Please restart your shell by running 'source .bashrc'"
-
+log "Installation completed! Please paste your 1Password service account token into '.bashrc' and then restart your shell with 'source .bashrc'"
