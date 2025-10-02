@@ -89,6 +89,7 @@ export OP_SERVICE_ACCOUNT_TOKEN=
 if [ -z "$OP_SERVICE_ACCOUNT_TOKEN" ]; then
     echo "1Password service account token not set. You won't be able to access your secrets."
 else
+    echo "Found 1Password service account token. Setting secrets..."
     export GH_TOKEN=$(op read "op://Remote/GitHub Personal Access Token/token" 2>/dev/null || echo "")
     export HF_TOKEN=$(op read "op://Remote/Hugging Face API Token/user access token" 2>/dev/null || echo "")
     export OPENAI_API_KEY=$(op read "op://Remote/OpenAI API Key/api key" 2>/dev/null || echo "")
