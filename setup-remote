@@ -87,7 +87,6 @@ export OP_SERVICE_ACCOUNT_TOKEN=
 
 # Initialize starship
 eval "$(starship init bash)"
-
 EOL
 
 log "Updating .env..."
@@ -98,6 +97,6 @@ OPENAI_API_KEY=
 PRIME_API_KEY=
 PRIME_TEAM_ID=
 WANDB_API_KEY=
-fi
+EOL
 
 log "Installation completed! Please paste your 1Password service account token into '~/.bashrc' and then restart your shell with 'source ~/.bashrc'"
