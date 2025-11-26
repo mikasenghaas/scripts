@@ -99,4 +99,4 @@ PRIME_TEAM_ID=
 WANDB_API_KEY=
 EOL
 
-log "Installation completed! Please paste your 1Password service account token into '~/.bashrc' and then restart your shell with 'source ~/.bashrc'"
+log "Installation completed! Add API keys to ~/.env."
