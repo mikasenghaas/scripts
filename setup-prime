@@ -12,21 +12,21 @@ log() {
 
 log "Setting up prime-rl..."
 if [ ! -d "prime-rl" ]; then
-    curl -sSL https://raw.githubusercontent.com/PrimeIntellect-ai/prime-rl/main/scripts/install.sh | bash
+  curl -sSL https://raw.githubusercontent.com/PrimeIntellect-ai/prime-rl/main/scripts/install.sh | bash
 fi
 
-log "Setting up prime-environments..."
-if [ ! -d "prime-environments" ]; then
-    curl -sSL https://raw.githubusercontent.com/PrimeIntellect-ai/prime-environments/main/scripts/install.sh | bash
+log "Setting up reserach-environments..."
+if [ ! -d "research-environments" ]; then
+  curl -sSL https://raw.githubusercontent.com/PrimeIntellect-ai/research-environments/main/scripts/install.sh | bash
 fi
 
 log "Setting up verifiers..."
 if [ ! -d "verifiers" ]; then
-    curl -sSL https://raw.githubusercontent.com/PrimeIntellect-ai/verifiers/main/scripts/install.sh | bash
+  curl -sSL https://raw.githubusercontent.com/PrimeIntellect-ai/verifiers/main/scripts/install.sh | bash
 fi
 
 log "Setting up workspace..."
-cat > prime.code-workspace <<'EOL'
+cat >prime.code-workspace <<'EOL'
 {
     "folders": [
         {
