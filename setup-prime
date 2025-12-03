@@ -36,7 +36,7 @@ cat >prime.code-workspace <<'EOL'
             "path": "verifiers"
         },
         {
-            "path": "prime-environments"
+            "path": "research-environments"
         }
     ],
     "settings": {}
