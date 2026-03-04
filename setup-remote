@@ -17,7 +17,7 @@ if ! command -v sudo &>/dev/null; then
 fi
 
 log "Installing packages..."
-sudo apt update && sudo apt install -y tmux vim git htop nvtop exa bat iputils-ping iperf
+sudo apt update && sudo apt install -y tmux vim git htop nvtop exa bat iputils-ping iperf fzf
 
 # Install 1Password CLI
 if ! command -v op &>/dev/null; then
@@ -77,6 +77,14 @@ alias cat="bat --style=plain"
 # Make bat available on ubuntu
 if [ ! -e ~/.local/bin/bat ]; then
     ln -s /usr/bin/batcat ~/.local/bin/bat
+fi
+
+# Load fzf key bindings and completion
+if [ -f /usr/share/doc/fzf/examples/key-bindings.bash ]; then
+    source /usr/share/doc/fzf/examples/key-bindings.bash
+fi
+if [ -f /usr/share/doc/fzf/examples/completion.bash ]; then
+    source /usr/share/doc/fzf/examples/completion.bash
 fi
 
 # Add ~/.local/bin to path (for uv)
