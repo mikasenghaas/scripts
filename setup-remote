@@ -17,7 +17,7 @@ if ! command -v sudo &>/dev/null; then
 fi
 
 log "Installing packages..."
-sudo apt update && sudo apt install -y tmux vim git htop nvtop exa bat iputils-ping iperf fzf
+sudo apt update && sudo apt install -y tmux vim git htop nvtop bat iputils-ping iperf fzf
 
 # Install 1Password CLI
 if ! command -v op &>/dev/null; then
@@ -61,6 +61,16 @@ if ! command -v gh &>/dev/null; then
   sudo apt update && sudo apt install gh -y
 fi
 
+if ! command -v claude &>/dev/null; then
+  log "Installing Claude Code..."
+  curl -fsSL https://claude.ai/install.sh | bash
+fi
+
+if ! command -v codex &>/dev/null; then
+  log "Installing Codex..."
+  curl -fsSL https://chatgpt.com/codex/install.sh | sh
+fi
+
 log "Installing starship..."
 curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
 
@@ -70,8 +80,7 @@ cat >$HOME/.bashrc <<'EOL'
 [[ $- != *i* ]] && return
 
 # Aliases
-alias ls="exa"
-alias ll="exa -lal"
+alias ll="ls -lal"
 alias cat="bat --style=plain"
 
 # Make bat available on ubuntu
