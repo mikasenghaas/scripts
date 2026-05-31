@@ -21,7 +21,7 @@ sudo apt update && sudo apt install -y tmux vim git htop nvtop bat iputils-ping 
 
 # Install 1Password CLI
 if ! command -v op &>/dev/null; then
-  log "Installing 1Password CLI..."
+  log "Installing 1password-cli..."
   curl -sS https://downloads.1password.com/linux/keys/1password.asc |
     sudo gpg --dearmor --output /usr/share/keyrings/1password-archive-keyring.gpg &&
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/$(dpkg --print-architecture) stable main" |
@@ -42,33 +42,33 @@ if ! command -v uv &>/dev/null; then
 fi
 
 if ! command -v hf &>/dev/null; then
-  log "Installing HuggingFace CLI..."
+  log "Installing huggingface-hub..."
   uv tool install huggingface-hub[cli]
 fi
 
 if ! command -v wandb &>/dev/null; then
-  log "Installing Wandb CLI..."
+  log "Installing wandb..."
   uv tool install wandb
 fi
 
 if ! command -v prime &>/dev/null; then
-  log "Installing Prime CLI..."
+  log "Installing prime..."
   uv tool install prime
 fi
 
 if ! command -v gh &>/dev/null; then
-  log "Installing GitHub CLI..."
+  log "Installing gh..."
   sudo apt update && sudo apt install gh -y
 fi
 
 if ! command -v claude &>/dev/null; then
-  log "Installing Claude Code..."
+  log "Installing claude..."
   curl -fsSL https://claude.ai/install.sh | bash
 fi
 
 if ! command -v codex &>/dev/null; then
-  log "Installing Codex..."
-  curl -fsSL https://chatgpt.com/codex/install.sh | sh
+  log "Installing codex..."
+  curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh
 fi
 
 log "Installing starship..."
@@ -89,11 +89,14 @@ if [ ! -e ~/.local/bin/bat ]; then
 fi
 
 # Load fzf key bindings and completion
-if [ -f /usr/share/doc/fzf/examples/key-bindings.bash ]; then
-    source /usr/share/doc/fzf/examples/key-bindings.bash
-fi
-if [ -f /usr/share/doc/fzf/examples/completion.bash ]; then
-    source /usr/share/doc/fzf/examples/completion.bash
+if command -v fzf >/dev/null 2>&1; then
+    if fzf --bash >/dev/null 2>&1; then
+        eval "$(fzf --bash)"
+    else
+        [ -f /usr/share/doc/fzf/examples/key-bindings.bash ] && source /usr/share/doc/fzf/examples/key-bindings.bash
+        [ -f /usr/share/bash-completion/completions/fzf ] && source /usr/share/bash-completion/completions/fzf
+        [ -f /usr/share/doc/fzf/examples/completion.bash ] && source /usr/share/doc/fzf/examples/completion.bash
+    fi
 fi
 
 # Add ~/.local/bin to path (for uv)
