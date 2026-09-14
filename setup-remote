@@ -54,6 +54,30 @@ log "Linking Neovim config from dotfiles..."
 mkdir -p $HOME/.config
 ln -sfn $HOME/dev/dotfiles/.config/nvim $HOME/.config/nvim
 
+# nvim-treesitter builds parsers with the tree-sitter CLI. Mason's prebuilt
+# needs glibc >= 2.39 (crashes on Ubuntu 22.04). On older glibc, build it from
+# source; LazyVim prefers any tree-sitter already on PATH and skips Mason then.
+glibc=$(ldd --version | head -1 | grep -o '[0-9.]*$')
+if [ "$(printf '%s\n2.39\n' "$glibc" | sort -V | head -1)" != "2.39" ]; then
+  log "glibc $glibc < 2.39: providing source-built tree-sitter-cli"
+  if [ ! -e $HOME/.cargo/bin/tree-sitter ]; then
+    sudo apt install -y libclang-dev
+    if [ ! -e $HOME/.cargo/bin/cargo ]; then
+      log "Installing rust (minimal profile)..."
+      curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+    fi
+    log "Building tree-sitter-cli 0.26.13 from source (takes a few minutes)..."
+    $HOME/.cargo/bin/cargo install tree-sitter-cli --version 0.26.13 --locked
+  fi
+  ln -sf $HOME/.cargo/bin/tree-sitter $HOME/.local/bin/tree-sitter
+  # replace a crashing mason copy left by older script runs
+  if [ -e $HOME/.local/share/nvim/mason/bin/tree-sitter ] &&
+    ! $HOME/.local/share/nvim/mason/bin/tree-sitter --version >/dev/null 2>&1; then
+    cp -f $HOME/.cargo/bin/tree-sitter $HOME/.local/share/nvim/mason/packages/tree-sitter-cli/tree-sitter-*
+    log "Replaced broken mason tree-sitter-cli with source-built binary"
+  fi
+fi
+
 log "Bootstrapping Neovim plugins from lazy-lock.json..."
 $HOME/.local/bin/nvim --headless "+Lazy! restore" +qa </dev/null || log "Plugins will finish installing on first nvim launch"
 
