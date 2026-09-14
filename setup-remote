@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -e
+set -o pipefail
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -125,18 +126,18 @@ fi
 
 if [ ! -e $HOME/.local/bin/claude ]; then
   log "Installing claude..."
-  curl -fsSL https://claude.ai/install.sh | bash
+  curl -fsSL https://claude.ai/install.sh | bash || log "claude install failed, continuing"
 fi
 
 if [ ! -e $HOME/.local/bin/codex ]; then
   log "Installing codex..."
-  curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh
+  curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh || log "codex install failed, continuing"
 fi
 
-# --- prime-agent (npm global; needs node >= 22.8) ---
+# --- node via nvm (general npm tooling; prime-agent no longer needs it) ---
 if [ ! -d $HOME/.nvm ]; then
   log "Installing nvm..."
-  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.7/install.sh | PROFILE=/dev/null bash
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.7/install.sh | PROFILE=/dev/null bash || log "nvm install failed, continuing"
 fi
 if ! grep -q "NVM_DIR" $HOME/.bashrc 2>/dev/null; then
   log "Adding nvm init to .bashrc..."
@@ -146,11 +147,13 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 if ! command -v node &>/dev/null; then
   log "Installing node LTS..."
-  nvm install --lts
+  nvm install --lts || log "node install failed, continuing"
 fi
-if ! command -v prime-agent &>/dev/null; then
+# --- prime-agent (official installer; self-contained runtime, no node needed) ---
+if [ ! -e $HOME/.local/bin/prime-agent ]; then
   log "Installing prime-agent..."
-  npm install -g prime-agent
+  curl --proto '=https' --proto-redir '=https' -fsSL https://app.primeintellect.ai/prime-agent/install.sh |
+    PRIME_AGENT_INSTALLER_NONINTERACTIVE=1 sh || log "prime-agent install failed, continuing"
 fi
 
 log "Installing starship..."
