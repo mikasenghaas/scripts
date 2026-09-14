@@ -11,7 +11,7 @@ log() {
   echo -e "${GREEN}[INFO]${NC} $1"
 }
 
-log "Running setup-remote v3"
+log "Running setup-remote"
 
 # --- system packages ---
 log "Installing system packages..."
