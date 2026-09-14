@@ -21,16 +21,27 @@ sudo apt update && sudo apt install -y tmux vim git htop nvtop bat iputils-ping 
 
 # --- Neovim (editor) ---
 log "Installing Neovim + editor dependencies..."
-sudo apt install -y build-essential ripgrep fd-find
+sudo apt install -y build-essential ripgrep fd-find unzip # unzip: Mason needs it (stylua etc.)
 mkdir -p $HOME/.local/bin
 ln -sf "$(command -v fdfind)" $HOME/.local/bin/fd # Ubuntu ships fd as fdfind
+arch=$(dpkg --print-architecture)
+if [ "$arch" = "amd64" ]; then arch=x86_64; fi # GitHub release assets use x86_64, not amd64
+
 if [ ! -e $HOME/.local/bin/nvim ]; then
-  arch=$(dpkg --print-architecture)
-  if [ "$arch" = "amd64" ]; then arch=x86_64; fi # Neovim assets use x86_64, not amd64
   url=https://github.com/neovim/neovim/releases/latest/download/nvim-linux-$arch.tar.gz
   log "Downloading Neovim: $url"
   curl -fsSL $url | tar xz -C $HOME/.local
   ln -sf $HOME/.local/nvim-linux-$arch/bin/nvim $HOME/.local/bin/nvim
+fi
+
+# LazyVim stages/commits through lazygit (<leader>gg)
+if [ ! -e $HOME/.local/bin/lazygit ]; then
+  tag=$(curl -fsSL https://api.github.com/repos/jesseduffield/lazygit/releases/latest |
+    grep -o '"tag_name": *"[^"]*"' | cut -d '"' -f4)
+  ver=${tag#v}
+  url=https://github.com/jesseduffield/lazygit/releases/download/$tag/lazygit_${ver}_Linux_$arch.tar.gz
+  log "Downloading lazygit: $url"
+  curl -fsSL $url | tar xz -C $HOME/.local/bin lazygit
 fi
 
 if [ ! -d $HOME/dev/dotfiles ]; then
@@ -59,7 +70,7 @@ if ! command -v op &>/dev/null; then
     sudo mkdir -p /usr/share/debsig/keyrings/AC2D62742012EA22 &&
     curl -sS https://downloads.1password.com/linux/keys/1password.asc |
     sudo gpg --dearmor --output /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg &&
-    sudo apt update && sudo apt install 1password-cli
+    sudo apt update && sudo apt install -y 1password-cli
 fi
 
 if ! command -v uv &>/dev/null; then
@@ -102,7 +113,12 @@ log "Installing starship..."
 curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
 
 log "Updating .bashrc..."
-cat >$HOME/.bashrc <<'EOL'
+if grep -q "starship init bash" $HOME/.bashrc 2>/dev/null; then
+  log ".bashrc already set up, leaving it untouched"
+else
+  cat >>$HOME/.bashrc <<'EOL'
+
+# --- setup-remote managed block ---
 # Guard
 [[ $- != *i* ]] && return
 
@@ -135,9 +151,13 @@ export OP_SERVICE_ACCOUNT_TOKEN=
 # Initialize starship
 eval "$(starship init bash)"
 EOL
+fi
 
-log "Updating .env..."
-cat >$HOME/.env <<'EOL'
+if [ -f $HOME/.env ]; then
+  log "~/.env already exists, leaving it untouched"
+else
+  log "Creating ~/.env template (fill in API keys)..."
+  cat >$HOME/.env <<'EOL'
 GH_TOKEN=
 HF_TOKEN=
 OPENAI_API_KEY=
@@ -145,5 +165,7 @@ PRIME_API_KEY=
 PRIME_TEAM_ID=
 WANDB_API_KEY=
 EOL
+  chmod 600 $HOME/.env
+fi
 
 log "Installation completed! Add API keys to ~/.env, then run \":Copilot auth\" in nvim once to enable Copilot."
