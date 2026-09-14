@@ -19,6 +19,31 @@ fi
 log "Installing packages..."
 sudo apt update && sudo apt install -y tmux vim git htop nvtop bat iputils-ping iperf fzf
 
+# --- Neovim (editor) ---
+log "Installing Neovim + editor dependencies..."
+sudo apt install -y build-essential ripgrep fd-find
+mkdir -p $HOME/.local/bin
+ln -sf "$(command -v fdfind)" $HOME/.local/bin/fd # Ubuntu ships fd as fdfind
+if [ ! -e $HOME/.local/bin/nvim ]; then
+  arch=$(dpkg --print-architecture)
+  curl -fsSL https://github.com/neovim/neovim/releases/latest/download/nvim-linux-$arch.tar.gz |
+    tar xz -C $HOME/.local
+  ln -sf $HOME/.local/nvim-linux-$arch/bin/nvim $HOME/.local/bin/nvim
+fi
+
+if [ ! -d $HOME/dev/dotfiles ]; then
+  log "Cloning dotfiles..."
+  mkdir -p $HOME/dev
+  git clone https://github.com/mikasenghaas/dotfiles.git $HOME/dev/dotfiles
+fi
+
+log "Linking Neovim config from dotfiles..."
+mkdir -p $HOME/.config
+ln -sfn $HOME/dev/dotfiles/.config/nvim $HOME/.config/nvim
+
+log "Bootstrapping Neovim plugins from lazy-lock.json..."
+$HOME/.local/bin/nvim --headless "+Lazy! restore" +qa </dev/null || log "Plugins will finish installing on first nvim launch"
+
 # Install 1Password CLI
 if ! command -v op &>/dev/null; then
   log "Installing 1password-cli..."
@@ -119,4 +144,4 @@ PRIME_TEAM_ID=
 WANDB_API_KEY=
 EOL
 
-log "Installation completed! Add API keys to ~/.env."
+log "Installation completed! Add API keys to ~/.env, then run \":Copilot auth\" in nvim once to enable Copilot."
