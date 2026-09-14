@@ -11,22 +11,17 @@ log() {
   echo -e "${GREEN}[INFO]${NC} $1"
 }
 
-log "Running setup-remote @1b10541+" # bump this marker with every change
+log "Running setup-remote v3"
 
-# Install sudo if not present
-log "Updating package index..."
-if ! command -v sudo &>/dev/null; then
-  apt update && apt install -y sudo
-fi
+# --- system packages ---
+log "Installing system packages..."
+sudo apt update &&
+  sudo apt install -y tmux vim git htop nvtop bat iputils-ping iperf fzf unzip build-essential ripgrep fd-find
 
-log "Installing packages..."
-sudo apt update && sudo apt install -y tmux vim git htop nvtop bat iputils-ping iperf fzf
-
-# --- Neovim (editor) ---
-log "Installing Neovim + editor dependencies..."
-sudo apt install -y build-essential ripgrep fd-find unzip # unzip: Mason needs it (stylua etc.)
+# --- Neovim + dotfiles ---
 mkdir -p $HOME/.local/bin
 ln -sf "$(command -v fdfind)" $HOME/.local/bin/fd # Ubuntu ships fd as fdfind
+
 arch=$(dpkg --print-architecture)
 if [ "$arch" = "amd64" ]; then arch=x86_64; fi # GitHub release assets use x86_64, not amd64
 
@@ -84,7 +79,7 @@ fi
 log "Bootstrapping Neovim plugins from lazy-lock.json..."
 $HOME/.local/bin/nvim --headless "+Lazy! restore" +qa </dev/null || log "Plugins will finish installing on first nvim launch"
 
-# Install 1Password CLI
+# --- 1Password CLI ---
 if ! command -v op &>/dev/null; then
   log "Installing 1password-cli..."
   curl -sS https://downloads.1password.com/linux/keys/1password.asc |
@@ -100,32 +95,35 @@ if ! command -v op &>/dev/null; then
     sudo apt update && sudo apt install -y 1password-cli
 fi
 
-if ! command -v uv &>/dev/null; then
+# --- python tools (uv) ---
+if [ ! -e $HOME/.local/bin/uv ]; then
   log "Installing uv..."
   curl -LsSf https://astral.sh/uv/install.sh | sh
-  source $HOME/.local/bin/env
 fi
+export PATH="$HOME/.local/bin:$PATH"
 
-if ! command -v hf &>/dev/null; then
+if [ ! -e $HOME/.local/bin/hf ]; then
   log "Installing huggingface-hub..."
-  uv tool install huggingface-hub[cli]
+  uv tool install huggingface-hub[cli] || log "hf install failed, continuing"
 fi
 
-if ! command -v wandb &>/dev/null; then
+if [ ! -e $HOME/.local/bin/wandb ]; then
   log "Installing wandb..."
-  uv tool install wandb
+  uv tool install wandb || log "wandb install failed, continuing"
 fi
 
-if ! command -v prime &>/dev/null; then
+if [ ! -e $HOME/.local/bin/prime ]; then
   log "Installing prime..."
-  uv tool install prime
+  uv tool install prime || log "prime install failed, continuing"
 fi
 
+# --- GitHub CLI ---
 if ! command -v gh &>/dev/null; then
   log "Installing gh..."
-  sudo apt update && sudo apt install gh -y
+  sudo apt install -y gh
 fi
 
+# --- agent CLIs ---
 if [ ! -e $HOME/.local/bin/claude ]; then
   log "Installing claude..."
   curl -fsSL https://claude.ai/install.sh | bash || log "claude install failed, continuing"
@@ -151,16 +149,27 @@ if ! command -v node &>/dev/null; then
   log "Installing node LTS..."
   nvm install --lts || log "node install failed, continuing"
 fi
-# --- prime-agent (official installer; self-contained runtime, no node needed) ---
+
+# --- prime-agent (official installer, fully non-interactive) ---
 if [ ! -e $HOME/.local/bin/prime-agent ]; then
+  # pre-add the standalone-node PATH line so the installer skips its PATH prompt
+  if ! grep -q "prime-agent-node/current/bin" $HOME/.bashrc 2>/dev/null; then
+    printf '\n# prime-agent standalone node\nexport PATH="%s/.local/share/prime-agent-node/current/bin:$PATH"\n' "$HOME" >> $HOME/.bashrc
+  fi
   log "Installing prime-agent..."
   curl --proto '=https' --proto-redir '=https' -fsSL https://app.primeintellect.ai/prime-agent/install.sh |
-    PRIME_AGENT_INSTALLER_NONINTERACTIVE=1 sh || log "prime-agent install failed, continuing"
+    PRIME_AGENT_INSTALLER_NONINTERACTIVE=1 PRIME_AGENT_INSTALLER_PLAIN=1 \
+      PRIME_AGENT_BOOTSTRAP_TOOLS_ON_INSTALL=1 PRIME_AGENT_BOOTSTRAP_KERNEL_ON_INSTALL=1 \
+      PRIME_AGENT_INSTALL_UV=1 sh || log "prime-agent install failed, continuing"
 fi
 
-log "Installing starship..."
-curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
+# --- starship ---
+if ! command -v starship &>/dev/null; then
+  log "Installing starship..."
+  curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
+fi
 
+# --- shell config ---
 log "Updating .bashrc..."
 if grep -q "starship init bash" $HOME/.bashrc 2>/dev/null; then
   log ".bashrc already set up, leaving it untouched"
@@ -191,7 +200,7 @@ if command -v fzf >/dev/null 2>&1; then
     fi
 fi
 
-# Add ~/.local/bin to path (for uv)
+# Add ~/.local/bin to path
 export PATH="$HOME/.local/bin:$PATH"
 
 # Access 1Password secrets temporarily
