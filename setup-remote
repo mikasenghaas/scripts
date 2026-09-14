@@ -226,4 +226,4 @@ EOL
   chmod 600 $HOME/.env
 fi
 
-log "Installation completed! Add API keys to ~/.env, then run \":Copilot auth\" in nvim once to enable Copilot."
+log "Installation completed! Add API keys to ~/.env."
