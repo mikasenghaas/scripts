@@ -26,8 +26,10 @@ mkdir -p $HOME/.local/bin
 ln -sf "$(command -v fdfind)" $HOME/.local/bin/fd # Ubuntu ships fd as fdfind
 if [ ! -e $HOME/.local/bin/nvim ]; then
   arch=$(dpkg --print-architecture)
-  curl -fsSL https://github.com/neovim/neovim/releases/latest/download/nvim-linux-$arch.tar.gz |
-    tar xz -C $HOME/.local
+  if [ "$arch" = "amd64" ]; then arch=x86_64; fi # Neovim assets use x86_64, not amd64
+  url=https://github.com/neovim/neovim/releases/latest/download/nvim-linux-$arch.tar.gz
+  log "Downloading Neovim: $url"
+  curl -fsSL $url | tar xz -C $HOME/.local
   ln -sf $HOME/.local/nvim-linux-$arch/bin/nvim $HOME/.local/bin/nvim
 fi
 
